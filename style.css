@@ -1,0 +1,416 @@
+/* ================================= */
+/* VEDANTA REFINERY PREMIUM STYLE */
+/* ================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --text:#222222;
+    --border:#d9dfe8;
+    --primary:#0056b3;
+    --primary-dark:#003d80;
+    --table:#0b63ce;
+    --shadow:0 10px 30px rgba(0,0,0,0.12);
+}
+
+body.dark{
+    --bg:#0f172a;
+    --card:#1e293b;
+    --text:#f8fafc;
+    --border:#475569;
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --table:#2563eb;
+    --shadow:0 10px 35px rgba(0,0,0,0.4);
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    padding:20px;
+    transition:.3s;
+}
+
+/* =============================== */
+/* STICKY TOP BAR PANELS */
+/* =============================== */
+
+.topbar{
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:25px;
+    background: var(--card);
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    backdrop-filter: blur(8px);
+}
+
+.company-name{
+    font-size:22px;
+    font-weight:700;
+    color:var(--primary);
+}
+
+.action-buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.action-buttons button{
+    color:white;
+    border:none;
+    padding:10px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+    transition:.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-theme { background: #4b5563; }
+.btn-save { background: #059669; }
+.btn-preview { background: #3b82f6; }
+.btn-pdf { background: #8b5cf6; }
+.btn-print { background: #d97706; }
+.btn-clear { background: #dc2626; }
+
+.action-buttons button:hover{
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+/* =============================== */
+/* FORM SECTION & CUSTOM PARTS */
+/* =============================== */
+
+.form-card{
+    max-width:1200px;
+    margin:auto;
+    background:var(--card);
+    padding:35px;
+    border-radius:16px;
+    box-shadow:var(--shadow);
+}
+
+.logo-area{
+    text-align:center;
+    margin-bottom:15px;
+}
+
+.company-logo{
+    width:180px;
+    height:auto;
+}
+
+.form-card h1{
+    text-align:center;
+    color:var(--primary);
+    font-size:32px;
+    margin-bottom:8px;
+}
+
+.form-card h2{
+    text-align:center;
+    font-weight:500;
+    margin-bottom:30px;
+    font-size: 20px;
+}
+
+.form-card h3{
+    margin:25px 0 15px;
+    color:var(--primary);
+}
+
+.form-grid, .expense-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+}
+
+.field label{
+    margin-bottom:8px;
+    font-weight:600;
+}
+
+.field input, .field textarea, .field select{
+    padding:12px;
+    font-size:15px;
+    border:2px solid var(--border);
+    border-radius:8px;
+    background:var(--card);
+    color:var(--text);
+    outline: none;
+    transition: border-color .3s, box-shadow .3s;
+}
+
+.field input:focus, .field textarea:focus, .field select:focus{
+    border-color: var(--primary);
+    box-shadow: 0 0 8px rgba(0, 86, 179, 0.2);
+}
+
+.char-counter {
+    font-size: 11px;
+    color: #6b7280;
+    text-align: right;
+    margin-top: 4px;
+}
+
+.btn-copy {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 3px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-copy:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.full{
+    grid-column:1 / -1;
+}
+
+hr{
+    margin:30px 0;
+    border:none;
+    height:1px;
+    background:var(--border);
+}
+
+/* =============================== */
+/* PDF REPORT STYLE WITH DIGI SIGN */
+/* =============================== */
+
+#pdfReport{
+    max-width:210mm;
+    min-height:297mm;
+    margin:40px auto;
+    background:white;
+    color:black;
+    padding:25mm 20mm;
+    box-shadow: 0 0 25px rgba(0,0,0,.15);
+    border-radius:10px;
+}
+
+.report-header{
+    display:flex;
+    align-items:center;
+    gap:25px;
+    padding-bottom:20px;
+    border-bottom: 3px solid #0b63ce;
+}
+
+.report-logo{
+    width:160px;
+    height:auto;
+}
+
+.header-right h1{
+    font-size:30px;
+    color:#0b63ce;
+    margin-bottom:5px;
+}
+
+.header-right h3{
+    font-size:18px;
+    margin-bottom:5px;
+}
+
+.report-info{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    margin-top:25px;
+    margin-bottom:25px;
+}
+
+.info-box{
+    flex:1;
+    border:1px solid #d9d9d9;
+    padding:15px;
+    border-radius:10px;
+}
+
+.info-box h3{
+    color:#0b63ce;
+    margin-bottom:10px;
+}
+
+.info-box p{
+    margin-bottom:8px;
+    line-height:1.5;
+}
+
+.status-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.report-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+    margin-bottom:25px;
+}
+
+.report-table th{
+    background:#0b63ce;
+    color:white;
+    padding:14px;
+    border:1px solid #cfd8e3;
+    text-align:left;
+    width:30%;
+}
+
+.report-table td{
+    padding:14px;
+    border:1px solid #cfd8e3;
+    vertical-align:top;
+    line-height:1.6;
+}
+
+#pdfReport h2{
+    margin-top:25px;
+    margin-bottom:12px;
+    color:#0b63ce;
+    font-size:20px;
+}
+
+/* SIGNATURE AREA PRESTIGE */
+.signature-area{
+    display:flex;
+    justify-content:space-between;
+    margin-top:50px;
+    gap:40px;
+}
+
+.employee-sign, .manager-sign{
+    width:45%;
+    text-align:center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.digital-signature {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 20px;
+    color: #0056b3;
+    margin-bottom: 5px;
+    text-align: center;
+    min-height: 30px;
+}
+
+.signature-line{
+    border-top:2px solid black;
+    margin-bottom: 5px;
+}
+
+.stamp-image{
+    width:150px;
+    height:auto;
+    margin: 5px auto 0;
+}
+
+.footer-section{
+    margin-top:60px;
+    text-align:center;
+    font-size:13px;
+    color:#666;
+}
+
+/* DARK MODE CONFIGS */
+body.dark .form-card, body.dark .topbar{
+    background:var(--card);
+    color:var(--text);
+}
+body.dark .field input, body.dark .field textarea, body.dark .field select{
+    background:#111827;
+    color:white;
+}
+body.dark .company-name{ color:#60a5fa; }
+body.dark .btn-copy { color: white; border-color: #475569;}
+
+/* PRINT INTERFACE */
+@media print{
+    body{ background:white; padding:0; }
+    .topbar, .form-card{ display:none !important; }
+    #pdfReport{ display:block !important; margin:0; padding:15mm; box-shadow:none; border-radius:0; width:100%; max-width:none; }
+}
+
+/* =============================== */
+/* MOBILE BOTTOM FLOATING PANELS FIX */
+/* =============================== */
+
+@media(max-width:768px){
+    body { padding: 10px 10px 90px 10px; }
+    
+    .topbar {
+        position: static;
+        box-shadow: none;
+        padding: 10px 5px;
+        text-align: center;
+    }
+    .company-name { width: 100%; font-size: 18px; margin-bottom: 5px;}
+    
+    .topbar .action-buttons {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--card);
+        padding: 12px;
+        gap: 8px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        z-index: 9999;
+    }
+    
+    .action-buttons button {
+        padding: 8px 4px;
+        font-size: 11px;
+        text-align: center;
+        border-radius: 6px;
+    }
+    
+    .form-grid, .expense-grid{ grid-template-columns:1fr; gap:12px; }
+    .form-card { padding: 15px; }
+    .form-card h1 { font-size: 22px; }
+    .report-info{ flex-direction:column; gap:10px;}
+    .report-header{ flex-direction:column; text-align:center; }
+    .header-right h1{ font-size:22px; }
+    .signature-area{ flex-direction:column; gap: 40px; }
+    .employee-sign, .manager-sign{ width:100%; }
+    #pdfReport{ padding:15px; margin: 20px auto; }
+}

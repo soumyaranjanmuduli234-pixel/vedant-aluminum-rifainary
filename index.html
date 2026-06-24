@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VEDANTA ALUMINUM REFINERY PVT . LTD REPORT SYSTEM</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="company-name">
+            VEDANTA ALUMINUM REFINERY PVT . LTD
+        </div>
+        <div class="action-buttons">
+            <button onclick="toggleTheme()" class="btn-theme">🌙 Dark / Light</button>
+            <button onclick="saveData()" class="btn-save">💾 Save Data</button>
+            <button onclick="generatePreview()" class="btn-preview">📊 Generate Report</button>
+            <button onclick="downloadPDF()" class="btn-pdf">📥 Download PDF</button>
+            <button onclick="printReport()" class="btn-print">🖨️ Print Report</button>
+            <button onclick="clearData()" class="btn-clear">🗑️ Clear Data</button>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <div class="logo-area">
+            <img src="logo.jpg" alt="Company Logo" class="company-logo">
+        </div>
+
+        <h1>VEDANTA ALUMINUM REFINERY PVT . LTD</h1>
+        <h2>EMPLOYEE WORK EXPENSE REPORT SYSTEM</h2>
+
+        <div class="form-grid">
+            <div class="field">
+                <label>Bill Number</label>
+                <input type="text" id="billNo" readonly>
+            </div>
+
+            <div class="field">
+                <label>Date & Time</label>
+                <input type="text" id="dateTime" readonly>
+            </div>
+
+            <div class="field">
+                <label>Employee Name</label>
+                <input type="text" id="employeeName" placeholder="Enter Full Name">
+            </div>
+
+            <div class="field">
+                <label>Employee ID</label>
+                <input type="text" id="employeeId" placeholder="Enter ID">
+            </div>
+
+            <div class="field">
+                <label>Employee Mob.no</label>
+                <input type="text" id="employeeMob" placeholder="Enter Mobile Number">
+            </div>
+
+            <div class="field">
+                <label>Employee Role</label>
+                <input type="text" id="employeeRole" placeholder="Enter Designation/Role">
+            </div>
+
+            <div class="field full">
+                <label>Department</label>
+                <input type="text" id="department" placeholder="Enter Department Name">
+            </div>
+
+            <div class="field full">
+                <label>Heading Of Report</label>
+                <input type="text" id="reportHeading" placeholder="Enter Subject/Heading">
+            </div>
+
+            <div class="field full" style="position: relative;">
+                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label style="margin:0;">Work Details</label>
+                    <button onclick="copyWorkDetails()" type="button" class="btn-copy">📋 Copy Text</button>
+                </div>
+                <textarea id="workDetails" rows="8" placeholder="Type report text here..."></textarea>
+                <span id="charCount" class="char-counter">0 characters | 0 words</span>
+            </div>
+
+            <div class="field">
+                <label>Status</label>
+                <select id="status">
+                    <option value="Pending">Pending 🔴</option>
+                    <option value="In Progress">In Progress 🟡</option>
+                    <option value="Completed">Completed 🟢</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Work Location</label>
+                <input type="text" id="location" value="Vedanta Refinery">
+            </div>
+        </div>
+
+        <hr>
+        <h3>Expense Information</h3>
+        <div class="expense-grid">
+            <div class="field">
+                <label>Advance Amount (₹)</label>
+                <input type="number" id="advance" placeholder="0.00">
+            </div>
+
+            <div class="field">
+                <label>Expense Amount (₹)</label>
+                <input type="number" id="expense" placeholder="0.00">
+            </div>
+
+            <div class="field">
+                <label>Balance Amount (₹)</label>
+                <input type="number" id="balance" readonly value="0.00">
+            </div>
+
+            <div class="field">
+                <label>Required Amount (₹)</label>
+                <input type="number" id="required" readonly value="0.00">
+            </div>
+        </div>
+    </div>
+
+    <div id="pdfReport">
+        <div class="report-header">
+            <div class="header-left">
+                <img src="logo.jpg" alt="Logo" class="report-logo">
+            </div>
+            <div class="header-right">
+                <h1>VEDANTA ALUMINUM REFINERY</h1>
+                <h3>EMPLOYEE WORK EXPENSE REPORT</h3>
+                <p>Official Internal Expense Documentation</p>
+            </div>
+        </div>
+
+        <div class="report-info">
+            <div class="info-box">
+                <h3>Employee Information</h3>
+                <p><b>Name :</b> <span id="pEmployeeName"></span></p>
+                <p><b>Employee ID :</b> <span id="pEmployeeId"></span></p>
+                <p><b>Department :</b> <span id="pDepartment"></span></p>
+                <p><b>Employee Mob.no :</b> <span id="pEmployeemobilenumber"></span></p>
+                <p><b>Employee Role :</b> <span id="pEmployeeroll"></span></p>
+            </div>
+
+            <div class="info-box">
+                <h3>Report Information</h3>
+                <p><b>Bill No :</b> <span id="pBillNo"></span></p>
+                <p><b>Date :</b> <span id="pDate"></span></p>
+                <p><b>Location :</b> <span id="pLocation"></span></p>
+                <p><b>Status :</b> <span id="pStatus" class="status-badge"></span></p>
+            </div>
+        </div>
+
+        <h2>WORK DETAILS</h2>
+        <table class="report-table">
+            <tr>
+                <th>Heading Of Report</th>
+                <td id="pHeading"></td>
+            </tr>
+            <tr>
+                <th>Work Description</th>
+                <td id="pWork"></td>
+            </tr>
+        </table>
+
+        <h2>EXPENSE SUMMARY</h2>
+        <table class="report-table">
+            <tr>
+                <th>Advance Amount</th>
+                <td id="pAdvance"></td>
+            </tr>
+            <tr>
+                <th>Expense Amount</th>
+                <td id="pExpense"></td>
+            </tr>
+            <tr>
+                <th>Balance Amount</th>
+                <td id="pBalance"></td>
+            </tr>
+            <tr>
+                <th>Required Amount</th>
+                <td id="pRequired"></td>
+            </tr>
+        </table>
+        
+        <div id="pExpenseWords" style="font-weight: bold; font-size: 14px; margin-top: -10px; margin-bottom: 20px; color: #333; font-style: italic;"></div>
+
+        <div class="signature-area">
+            <div class="employee-sign">
+                <div id="pDigitalSignature" class="digital-signature"></div>
+                <div class="signature-line"></div>
+                <p>Employee Signature</p>
+            </div>
+            <div class="manager-sign">
+                <p>Approved By J.P.E </p>
+                <img src="logo.png" alt="Manager Stamp" class="stamp-image">
+            </div>
+        </div>
+
+        <div class="footer-section">
+            This report has been generated through VEDANTA ALUMINUM REFINERY PVT.LTD REPORT SYSTEM.
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
