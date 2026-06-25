@@ -5,31 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VEDANTA ALUMINUM REFINERY PVT . LTD REPORT SYSTEM</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body>
-    <div class="topbar">
-        <div class="company-name">
-            VEDANTA ALUMINUM REFINERY PVT . LTD
-        </div>
-        <div class="action-buttons">
-            <button onclick="toggleTheme()" class="btn-theme">🌙 Dark / Light</button>
-            <button onclick="saveData()" class="btn-save">💾 Save Data</button>
-            <button onclick="generatePreview()" class="btn-preview">📊 Generate Report</button>
-            <button onclick="downloadPDF()" class="btn-pdf">📥 Download PDF</button>
-            <button onclick="printReport()" class="btn-print">🖨️ Print Report</button>
-            <button onclick="clearData()" class="btn-clear">🗑️ Clear Data</button>
+    <div id="securityToast" class="glass-alert-frame">
+        <div class="glass-alert-content">
+            <span class="glass-alert-icon">🔒</span>
+            <div>
+                <h4>Security Protection Active</h4>
+                <p>Right-click and Developer tools have been locked for security.</p>
+            </div>
         </div>
     </div>
 
-    <div class="form-card">
+    <div id="clearConfirmModal" class="glass-modal-overlay">
+        <div class="glass-modal-card">
+            <span class="glass-modal-icon">🗑️</span>
+            <h3>Data Reset Warning</h3>
+            <p>Are you sure you want to completely clear all report data and inputs?</p>
+            <div class="glass-modal-buttons">
+                <button onclick="confirmClearData(true)" class="gbtn-confirm">🔄 Yes, Reset Data</button>
+                <button onclick="confirmClearData(false)" class="gbtn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="topbar no-print">
+        <div class="company-name">
+            VEDANTA ALUMINUM REFINERY
+        </div>
+        <div class="action-buttons">
+            <button onclick="toggleTheme()" class="btn-theme">🌙 Mode</button>
+            <button onclick="saveData()" class="btn-save">💾 Save</button>
+            <button onclick="generatePreview()" class="btn-preview">📊 Report</button>
+            <button onclick="downloadPDF()" class="btn-pdf">📥 PDF</button>
+            <button onclick="printReport()" class="btn-print">🖨️ Print</button>
+            <button onclick="triggerClearModal()" class="btn-clear">🗑️ Reset</button>
+        </div>
+    </div>
+
+    <div class="form-card no-print">
         <div class="logo-area">
             <img src="logo.jpg" alt="Company Logo" class="company-logo">
         </div>
 
         <h1>VEDANTA ALUMINUM REFINERY PVT . LTD</h1>
         <h2>EMPLOYEE WORK EXPENSE REPORT SYSTEM</h2>
+
+        <div class="system-radar-card">
+            <span class="radar-badge protection">🛡️ Anti-Inspect Active</span>
+            <span id="syncBadge" class="radar-badge sync-status">🟢 Auto-Sync Ready</span>
+        </div>
 
         <div class="form-grid">
             <div class="field">
@@ -54,7 +80,7 @@
 
             <div class="field">
                 <label>Employee Mob.no</label>
-                <input type="text" id="employeeMob" placeholder="Enter Mobile Number">
+                <input type="text" id="employeeMob" placeholder="Enter 10 Digit Mobile Number" maxlength="10">
             </div>
 
             <div class="field">
@@ -107,6 +133,17 @@
 
         <hr>
         <h3>Expense Information</h3>
+        
+        <div class="budget-analytics-card">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; font-size: 14px;">
+                <span>Budget Usage Dynamics Tracker</span>
+                <span id="usagePercentage">0% Used</span>
+            </div>
+            <div class="progress-bar-container">
+                <div id="dynamicProgressBar" class="progress-bar-fill"></div>
+            </div>
+        </div>
+
         <div class="expense-grid">
             <div class="field">
                 <label>Advance Amount (₹)</label>
@@ -130,90 +167,103 @@
         </div>
     </div>
 
-    <div id="pdfReport">
-        <div class="report-header">
-            <div class="header-left">
-                <img src="logo.jpg" alt="Logo" class="report-logo">
-            </div>
-            <div class="header-right">
-                <h1>VEDANTA ALUMINUM REFINERY</h1>
-                <h3>EMPLOYEE WORK EXPENSE REPORT</h3>
-                <p>Official Internal Expense Documentation</p>
-            </div>
-        </div>
-
-        <div class="report-info">
-            <div class="info-box">
-                <h3>Employee Information</h3>
-                <p><b>Name :</b> <span id="pEmployeeName"></span></p>
-                <p><b>Employee ID :</b> <span id="pEmployeeId"></span></p>
-                <p><b>Department :</b> <span id="pDepartment"></span></p>
-                <p><b>Employee Mob.no :</b> <span id="pEmployeemobilenumber"></span></p>
-                <p><b>Employee Role :</b> <span id="pEmployeeroll"></span></p>
-            </div>
-
-            <div class="info-box">
-                <h3>Report Information</h3>
-                <p><b>Bill No :</b> <span id="pBillNo"></span></p>
-                <p><b>Date :</b> <span id="pDate"></span></p>
-                <p><b>Location :</b> <span id="pLocation"></span></p>
-                <p><b>Status :</b> <span id="pStatus" class="status-badge"></span></p>
-            </div>
-        </div>
-
-        <h2>WORK DETAILS</h2>
-        <table class="report-table">
-            <tr>
-                <th>Heading Of Report</th>
-                <td id="pHeading"></td>
-            </tr>
-            <tr>
-                <th>Work Description</th>
-                <td id="pWork"></td>
-            </tr>
-        </table>
-
-        <h2>EXPENSE SUMMARY</h2>
-        <table class="report-table">
-            <tr>
-                <th>Advance Amount</th>
-                <td id="pAdvance"></td>
-            </tr>
-            <tr>
-                <th>Expense Amount</th>
-                <td id="pExpense"></td>
-            </tr>
-            <tr>
-                <th>Balance Amount</th>
-                <td id="pBalance"></td>
-            </tr>
-            <tr>
-                <th>Required Amount</th>
-                <td id="pRequired"></td>
-            </tr>
-        </table>
-        
-        <div id="pExpenseWords" style="font-weight: bold; font-size: 14px; margin-top: -10px; margin-bottom: 20px; color: #333; font-style: italic;"></div>
-
-        <div class="signature-area">
-            <div class="employee-sign">
-                <div id="pDigitalSignature" class="digital-signature">
-                    <img id="sigImage" src="" alt="Signature" style="display:none; max-height: 60px; margin: 0 auto;">
+    <div id="pdfReportWrapper" class="pdf-container-hide print-forced-visible">
+        <div id="pdfReport" class="premium-pdf-container">
+            <div class="report-header">
+                <div class="header-left">
+                    <img src="logo.jpg" alt="Logo" class="report-logo-large">
                 </div>
-                <div class="signature-line"></div>
-                <p>Employee Signature</p>
+                <div class="header-right">
+                    <h1>VEDANTA ALUMINUM REFINERY</h1>
+                    <h3>EMPLOYEE WORK EXPENSE REPORT</h3>
+                    <p class="sub-headline">Official Internal Expense Documentation</p>
+                </div>
             </div>
-            <div class="manager-sign">
-                <p>Approved By J.P.E </p>
-                <img src="logo.png" alt="Manager Stamp" class="stamp-image">
-            </div>
-        </div>
 
-        <div class="footer-section">
-            This report has been generated through VEDANTA ALUMINUM REFINERY PVT.LTD REPORT SYSTEM.
+            <div class="report-info">
+                <div class="info-box">
+                    <h4>Employee Profile</h4>
+                    <p><b>Name :</b> <span id="pEmployeeName"></span></p>
+                    <p><b>Employee ID :</b> <span id="pEmployeeId"></span></p>
+                    <p><b>Department :</b> <span id="pDepartment"></span></p>
+                    <p><b>Mobile No :</b> <span id="pEmployeemobilenumber"></span></p>
+                    <p><b>Designation :</b> <span id="pEmployeeroll"></span></p>
+                </div>
+
+                <div class="info-box">
+                    <h4>Metadata Overview</h4>
+                    <p><b>Bill No :</b> <span id="pBillNo" style="font-family: monospace; font-size:14px; font-weight:bold;"></span></p>
+                    <p><b>Date :</b> <span id="pDate"></span></p>
+                    <p><b>Location :</b> <span id="pLocation"></span></p>
+                    <p><b>Status :</b> <span id="pStatus" class="status-badge"></span></p>
+                </div>
+            </div>
+
+            <h3 class="section-title">WORK DESCRIPTION DETAILS</h3>
+            <table class="report-table">
+                <tr>
+                    <th>Heading Of Report</th>
+                    <td id="pHeading" style="font-weight: 600;"></td>
+                </tr>
+                <tr>
+                    <th>Work Breakdown</th>
+                    <td id="pWork" style="white-space: pre-wrap; line-height: 1.8;"></td>
+                </tr>
+            </table>
+
+            <h3 class="section-title">FINANCIAL SETTLEMENT SUMMARY</h3>
+            <table class="report-table">
+                <tr>
+                    <th>Advance Allocated</th>
+                    <td id="pAdvance" style="font-weight: 600; color: #0f172a;"></td>
+                </tr>
+                <tr>
+                    <th>Total Expense Claimed</th>
+                    <td id="pExpense" style="font-weight: 600; color: #0f172a;"></td>
+                </tr>
+                <tr class="highlight-row-balance">
+                    <th>Remaining Balance</th>
+                    <td id="pBalance" style="font-weight: 700; color: #059669;"></td>
+                </tr>
+                <tr class="highlight-row-required">
+                    <th>Required/Due Amount</th>
+                    <td id="pRequired" style="font-weight: 700; color: #dc2626;"></td>
+                </tr>
+            </table>
+            
+            <div id="pExpenseWords" class="amount-words-box"></div>
+
+            <div class="signature-row-container">
+                <div class="signature-col">
+                    <div id="pDigitalSignature" class="digital-signature">
+                        <img id="sigImage" src="" alt="Signature" style="display:none; max-height: 65px; margin: 0 auto;">
+                    </div>
+                    <div class="premium-signature-line"></div>
+                    <p class="sig-title">Employee Digital Signature</p>
+                </div>
+                
+                <div class="signature-col">
+                    <div class="stamp-wrapper">
+                        <img src="logo.jpg" alt="Manager Stamp" class="stamp-image-large">
+                    </div>
+                    <div class="premium-signature-line"></div>
+                    <p class="sig-title">Approved By J.P.E (Manager Stamp)</p>
+                </div>
+            </div>
+
+            <div class="footer-section-premium">
+                <p>Verification Code Secured Document. Generated Automatically via VEDANTA ALUMINUM REFINERY PVT.LTD Report Engine.</p>
+                <p class="confidential-tag">⚠️ CONFIDENTIAL INTERNAL AUDIT USE ONLY</p>
+            </div>
         </div>
     </div>
 
+    <script>
+        /*! html2pdf.js v0.10.1 | (c) eKoopmans | https://github.com/eKoopmans/html2pdf.js */
+        (function(m,k){"object"===typeof exports&&"undefined"!==typeof module?module.exports=k(require("html2canvas"),require("jspdf")):"function"===typeof define&&define.amd?define(["html2canvas","jspdf"],k):(m=m||self,m.html2pdf=k(m.html2canvas,m.jsPDF))})(this,function(m,k){function q(a){var c=Object.prototype.toString.call(a);if("[object Object]"===c)return"object";if("[object Array]"===c)return"array";if("[object String]"===c)return"string";if("[object Number]"===c)return"number";if("[object Boolean]"===c)return"boolean";if("[object Function]"===c)return"function"}function l(a,c){for(var d=0;d<a.length;d++)if(a[d]===c)return!0;return!1}return function(){function a(c,d){var e=this;if(e instanceof a){var f=new b;f=f.then(function(){e.options=Object.assign({},a.defaults);e.set(c)});d&&e.set(d)}else return new a(c,d)}var b=function(a){this}
+        b.prototype.then=function(a){return a()};a.defaults={margin:0,filename:"file.pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,logging:false,useCORS:true},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}};a.prototype.set=function(a){this.options=Object.assign(this.options,a);return this};a.prototype.from=function(a){this.source=a;return this};a.prototype.save=function(){var a=this;var c=document.createElement("a");c.href=a.source.toDataURL?a.source.toDataURL():"";c.download=a.options.filename;document.body.appendChild(c);c.click();document.body.removeChild(c);return a};return a}()});
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

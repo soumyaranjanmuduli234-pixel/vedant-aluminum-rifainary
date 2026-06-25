@@ -1,14 +1,40 @@
-/* ================================= */
-/* VEDANTA REFINERY REPORT SYSTEM */
-/* ADVANCED VERSION WITH PREMIUM FIX */
-/* ================================= */
+/* ======================================= */
+/* VEDANTA REFINERY REPORT SOFTWARE ENGINE */
+/* ======================================= */
 
 let canvas, ctx, isDrawing = false;
 
 document.addEventListener("DOMContentLoaded", function(){
+    setupAdvancedSecurity();
     initializeSystem();
     initSignaturePad();
 });
+
+function setupAdvancedSecurity() {
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        showSecurityToast();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (
+            e.keyCode === 123 || 
+            (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+            (e.ctrlKey && e.shiftKey && e.keyCode === 74) || 
+            (e.ctrlKey && e.keyCode === 85) 
+        ) {
+            e.preventDefault();
+            showSecurityToast();
+        }
+    });
+}
+
+function showSecurityToast() {
+    const toast = document.getElementById("securityToast");
+    if(!toast) return;
+    toast.style.top = "20px";
+    setTimeout(() => { toast.style.top = "-120px"; }, 3000);
+}
 
 function initializeSystem(){
     loadTheme();
@@ -20,58 +46,39 @@ function initializeSystem(){
     setupLiveListeners();
 }
 
-/* ============================== */
-/* DIGITAL SIGNATURE ENGINE SETUP */
-/* ============================== */
 function initSignaturePad() {
     canvas = document.getElementById("sigCanvas");
     if (!canvas) return;
     ctx = canvas.getContext("2d");
-    ctx.strokeStyle = "#0056b3"; // Professional Blue Ink
+    ctx.strokeStyle = "#0056b3"; 
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
 
-    // Mouse Events
     canvas.addEventListener("mousedown", (e) => { isDrawing = true; draw(e); });
     canvas.addEventListener("mousemove", draw);
     canvas.addEventListener("mouseup", () => { isDrawing = false; ctx.beginPath(); saveSignatureToStorage(); });
-    canvas.addEventListener("mouseout", () => isDrawing = false);
-
-    // Touch Events for Mobile/Tabs
+    
     canvas.addEventListener("touchstart", (e) => {
         isDrawing = true;
         const touch = e.touches[0];
-        const mouseEvent = new MouseEvent("mousedown", {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
+        const mouseEvent = new MouseEvent("mousedown", { clientX: touch.clientX, clientY: touch.clientY });
         canvas.dispatchEvent(mouseEvent);
         e.preventDefault();
     });
     canvas.addEventListener("touchmove", (e) => {
         const touch = e.touches[0];
-        const mouseEvent = new MouseEvent("mousemove", {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
+        const mouseEvent = new MouseEvent("mousemove", { clientX: touch.clientX, clientY: touch.clientY });
         canvas.dispatchEvent(mouseEvent);
         e.preventDefault();
     });
-    canvas.addEventListener("touchend", () => {
-        isDrawing = false;
-        ctx.beginPath();
-        saveSignatureToStorage();
-    });
+    canvas.addEventListener("touchend", () => { isDrawing = false; ctx.beginPath(); saveSignatureToStorage(); });
 }
 
 function draw(e) {
     if (!isDrawing) return;
     const rect = canvas.getBoundingClientRect();
-    
-    // Scaling calculations to support dynamic screen ratios
     const x = (e.clientX - rect.left) * (canvas.width / rect.width);
     const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-
     ctx.lineTo(x, y);
     ctx.stroke();
     ctx.beginPath();
@@ -79,7 +86,6 @@ function draw(e) {
 }
 
 function clearSignature() {
-    if(!canvas) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     document.getElementById("sigImage").style.display = "none";
     document.getElementById("sigImage").src = "";
@@ -87,15 +93,39 @@ function clearSignature() {
 }
 
 function saveSignatureToStorage() {
-    const dataURL = canvas.toDataURL();
-    localStorage.setItem("vedanta_signature", dataURL);
+    localStorage.setItem("vedanta_signature", canvas.toDataURL());
 }
 
-/* ============================== */
-/* AUTOMATIC SYNCS & COUNTERS */
-/* ============================== */
+function calculateBalance(){
+    let advance = parseFloat(document.getElementById("advance").value) || 0;
+    let expense = parseFloat(document.getElementById("expense").value) || 0;
+    
+    let balance = 0;
+    let required = 0;
+
+    if(expense > advance) {
+        balance = 0.00;
+        required = expense - advance;
+    } else {
+        balance = advance - expense;
+        required = 0.00;
+    }
+    
+    document.getElementById("balance").value = balance.toFixed(2);
+    document.getElementById("required").value = required.toFixed(2);
+
+    let percentage = advance > 0 ? Math.min(Math.round((expense / advance) * 100), 100) : (expense > 0 ? 100 : 0);
+    const fillBar = document.getElementById("dynamicProgressBar");
+    const txtPercent = document.getElementById("usagePercentage");
+    
+    if(fillBar && txtPercent) {
+        fillBar.style.width = percentage + "%";
+        txtPercent.innerText = percentage + "% Used";
+        fillBar.style.backgroundColor = percentage > 90 ? "#dc2626" : (percentage > 65 ? "#d97706" : "#059669");
+    }
+}
+
 function setupLiveListeners() {
-    // Work Details Live Char & Word Counter
     const workInput = document.getElementById("workDetails");
     workInput.addEventListener("input", function() {
         let text = this.value.trim();
@@ -103,59 +133,39 @@ function setupLiveListeners() {
         document.getElementById("charCount").innerText = this.value.length + " characters | " + wordCount + " words";
     });
 
-    // Status Live Border Glowing Feedback
-    const statusSelect = document.getElementById("status");
-    statusSelect.addEventListener("change", function() {
-        updateStatusGlow(this.value);
+    document.getElementById("employeeMob").addEventListener("input", function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
     });
-    updateStatusGlow(statusSelect.value);
 
-    // Expense Amount to Words Trigger
     const expenseInput = document.getElementById("expense");
-    expenseInput.addEventListener("input", function() {
-        updateAmountInWords(this.value);
+    const advanceInput = document.getElementById("advance");
+    [expenseInput, advanceInput].forEach(input => {
+        input.addEventListener("input", function() {
+            calculateBalance();
+            updateAmountInWords(expenseInput.value);
+        });
     });
 }
 
 function copyWorkDetails() {
     const text = document.getElementById("workDetails").value;
-    if(!text) { alert("Copy karne ke liye koi text nahi hai!"); return; }
+    if(!text) return;
     navigator.clipboard.writeText(text);
-    alert("Work details text clipboard par copy ho gaya hai!");
-}
-
-function updateStatusGlow(val) {
-    const statusSelect = document.getElementById("status");
-    if(val === "Pending") {
-        statusSelect.style.borderColor = "#dc2626";
-        statusSelect.style.boxShadow = "0 0 8px rgba(220, 38, 38, 0.2)";
-    } else if(val === "In Progress") {
-        statusSelect.style.borderColor = "#d97706";
-        statusSelect.style.boxShadow = "0 0 8px rgba(217, 119, 6, 0.2)";
-    } else {
-        statusSelect.style.borderColor = "#059669";
-        statusSelect.style.boxShadow = "0 0 8px rgba(5, 150, 105, 0.2)";
-    }
+    alert("Text Copied Successfully!");
 }
 
 function updateAmountInWords(amount) {
     let amt = parseFloat(amount) || 0;
     let wordBox = document.getElementById("pExpenseWords");
     if (!wordBox) return;
-    
-    if(amt === 0) {
-        wordBox.innerText = "";
-        return;
-    }
+    if(amt === 0) { wordBox.innerText = ""; return; }
     wordBox.innerText = "Amount in Words: Rupee " + numberToWords(Math.floor(amt)) + " Only";
 }
 
 function numberToWords(num) {
     const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
     const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-    
     if (num === 0) return 'Zero';
-    
     function convert(n) {
         if (n < 20) return a[n];
         if (n < 100) return b[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + a[n % 10] : '');
@@ -166,112 +176,57 @@ function numberToWords(num) {
     return convert(num);
 }
 
-/* ============================== */
-/* BILL & DATETIME GENERATORS */
-/* ============================== */
 function generateBillNumber(){
     const existingBill = localStorage.getItem("vedanta_bill_no");
-    if(existingBill && existingBill !== "undefined" && existingBill !== ""){
-        document.getElementById("billNo").value = existingBill;
-        return;
-    }
-    const year = new Date().getFullYear();
-    const random = Math.floor(1000 + Math.random() * 9000);
-    const billNo = "VAB-" + year + "-" + random;
+    if(existingBill){ document.getElementById("billNo").value = existingBill; return; }
+    const billNo = "VAB-" + new Date().getFullYear() + "-" + Math.floor(1000 + Math.random() * 9000);
     document.getElementById("billNo").value = billNo;
     localStorage.setItem("vedanta_bill_no", billNo);
 }
 
 function generateDateTime(){
-    const now = new Date();
-    const options = { year:"numeric", month:"long", day:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit" };
-    const dateText = now.toLocaleString("en-IN", options);
     const dateElement = document.getElementById("dateTime");
-    if(dateElement) dateElement.value = dateText;
+    if(dateElement) dateElement.value = new Date().toLocaleString("en-IN", { year:"numeric", month:"long", day:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit" });
 }
 
-/* ============================== */
-/* EXPENSE & BADGES TRACKER */
-/* ============================== */
-function calculateBalance(){
-    let advance = parseFloat(document.getElementById("advance").value) || 0;
-    let expense = parseFloat(document.getElementById("expense").value) || 0;
-    let balance = advance - expense;
-    
-    document.getElementById("balance").value = balance.toFixed(2);
-    
-    let required = 0;
-    if(balance < 0){
-        required = Math.abs(balance);
-    }
-    document.getElementById("required").value = required.toFixed(2);
-}
-
-function updateStatusBadge(statusValue) {
-    const badge = document.getElementById("pStatus");
-    badge.innerText = statusValue.toUpperCase();
-    badge.className = "status-badge"; 
-    
-    if(statusValue === "Pending") {
-        badge.style.background = "#fee2e2";
-        badge.style.color = "#dc2626";
-    } else if(statusValue === "In Progress") {
-        badge.style.background = "#fef3c7";
-        badge.style.color = "#d97706";
-    } else {
-        badge.style.background = "#d1fae5";
-        badge.style.color = "#059669";
-    }
-}
-
-/* ============================== */
-/* REPORT PREVIEW GENERATION */
-/* ============================== */
 function generatePreview(){
     calculateBalance();
+    const fields = ["employeeName", "employeeId", "department", "location", "employeeMob", "employeeRole", "billNo", "dateTime", "reportHeading", "workDetails", "advance", "expense", "balance", "required"];
+    const targets = ["pEmployeeName", "pEmployeeId", "pDepartment", "pLocation", "pEmployeemobilenumber", "pEmployeeroll", "pBillNo", "pDate", "pHeading", "pWork", "pAdvance", "pExpense", "pBalance", "pRequired"];
     
-    setText("pEmployeeName", "value", "employeeName");
-    setText("pEmployeeId", "value", "employeeId");
-    setText("pDepartment", "value", "department");
-    setText("pLocation", "value", "location");
-    setText("pEmployeemobilenumber", "value", "employeeMob");
-    setText("pEmployeeroll", "value", "employeeRole");
-    setText("pBillNo", "value", "billNo");
-    setText("pDate", "value", "dateTime");
-    setText("pHeading", "value", "reportHeading");
-    setText("pWork", "value", "workDetails");
+    fields.forEach((f, i) => {
+        let val = document.getElementById(f).value || "";
+        if(["advance", "expense", "balance", "required"].includes(f)) {
+            let num = parseFloat(val) || 0;
+            document.getElementById(targets[i]).innerText = "₹ " + num.toFixed(2);
+        } else {
+            document.getElementById(targets[i]).innerText = val;
+        }
+    });
     
-    // Sync Drawn Signature into Report Preview Wrapper
+    const currentStatus = document.getElementById("status").value;
+    const pStatus = document.getElementById("pStatus");
+    pStatus.innerText = currentStatus.toUpperCase();
+    if(currentStatus === "Completed") { pStatus.style.background = "#d1fae5"; pStatus.style.color = "#065f46"; }
+    else if(currentStatus === "In Progress") { pStatus.style.background = "#fef3c7"; pStatus.style.color = "#92400e"; }
+    else { pStatus.style.background = "#fee2e2"; pStatus.style.color = "#991b1b"; }
+
     const savedSig = localStorage.getItem("vedanta_signature");
-    const sigImg = document.getElementById("sigImage");
-    if (savedSig) {
-        sigImg.src = savedSig;
-        sigImg.style.display = "block";
-    } else {
-        sigImg.style.display = "none";
+    document.getElementById("sigImage").src = savedSig || "";
+    document.getElementById("sigImage").style.display = savedSig ? "block" : "none";
+    
+    const wrapper = document.getElementById("pdfReportWrapper");
+    if(wrapper) {
+        wrapper.className = "print-forced-visible pdf-container-show";
     }
-    
-    updateStatusBadge(document.getElementById("status").value);
-    updateAmountInWords(document.getElementById("expense").value);
-    
-    document.getElementById("pAdvance").innerText = "₹ " + (parseFloat(document.getElementById("advance").value) || 0).toFixed(2);
-    document.getElementById("pExpense").innerText = "₹ " + (parseFloat(document.getElementById("expense").value) || 0).toFixed(2);
-    document.getElementById("pBalance").innerText = "₹ " + (parseFloat(document.getElementById("balance").value) || 0).toFixed(2);
-    document.getElementById("pRequired").innerText = "₹ " + (parseFloat(document.getElementById("required").value) || 0).toFixed(2);
     
     saveData();
 }
 
-function setText(target, type, source){
-    const srcEl = document.getElementById(source);
-    const tgtEl = document.getElementById(target);
-    if(srcEl && tgtEl) tgtEl.innerText = srcEl[type] || "";
-}
-
-/* ============================== */
-/* STORAGE SYSTEM */
-/* ============================== */
 function saveData(){
+    const syncBadge = document.getElementById("syncBadge");
+    if(syncBadge) { syncBadge.innerText = "⏳ Saving..."; syncBadge.style.color = "#d97706"; }
+
     const formData = {
         employeeName: document.getElementById("employeeName").value,
         employeeId: document.getElementById("employeeId").value,
@@ -286,38 +241,31 @@ function saveData(){
         expense: document.getElementById("expense").value
     };
     localStorage.setItem("vedanta_report_data", JSON.stringify(formData));
+
+    setTimeout(() => {
+        if(syncBadge) { syncBadge.innerText = "🟢 Auto-Sync Saved"; syncBadge.style.color = "#059669"; }
+    }, 400);
 }
 
 function loadSavedData(){
     const data = localStorage.getItem("vedanta_report_data");
     if(!data) return;
-    
     const formData = JSON.parse(data);
     for(const key in formData){
-        const element = document.getElementById(key);
-        if(element) element.value = formData[key];
+        if(document.getElementById(key)) document.getElementById(key).value = formData[key];
     }
-    
-    // Load Signature Pad state if exist
     const savedSig = localStorage.getItem("vedanta_signature");
     if (savedSig && canvas) {
-        const img = new Image();
-        img.src = savedSig;
-        img.onload = function() {
-            ctx.drawImage(img, 0, 0);
-        };
+        const img = new Image(); img.src = savedSig;
+        img.onload = () => ctx.drawImage(img, 0, 0);
     }
-    
-    let txt = document.getElementById("workDetails").value.trim();
-    let words = txt === "" ? 0 : txt.split(/\s+/).length;
-    document.getElementById("charCount").innerText = document.getElementById("workDetails").value.length + " characters | " + words + " words";
+    updateAmountInWords(document.getElementById("expense").value);
 }
 
 function attachAutoSave(){
-    const elements = document.querySelectorAll("input, textarea, select");
-    elements.forEach(function(item){
-        item.addEventListener("input", function(){
-            if(item.id !== "billNo" && item.id !== "dateTime" && item.id !== "balance" && item.id !== "required") {
+    document.querySelectorAll("input, textarea, select").forEach(item => {
+        item.addEventListener("input", () => {
+            if(!["billNo", "dateTime", "balance", "required"].includes(item.id)) {
                 calculateBalance();
                 saveData();
             }
@@ -325,115 +273,55 @@ function attachAutoSave(){
     });
 }
 
-/* ============================== */
-/* UTILITIES & THEME */
-/* ============================== */
 function toggleTheme(){
     document.body.classList.toggle("dark");
     localStorage.setItem("vedanta_theme", document.body.classList.contains("dark") ? "dark" : "light");
 }
-
 function loadTheme(){
     if(localStorage.getItem("vedanta_theme") === "dark") document.body.classList.add("dark");
 }
 
-function downloadPDF(){
-    generatePreview();
-    if(typeof html2pdf === "undefined") {
-        alert("Library error! Please connect to internet to download PDF first.");
-        return;
-    }
+function triggerClearModal() {
+    const modal = document.getElementById("clearConfirmModal");
+    if(modal) modal.classList.add("active");
+}
+
+function confirmClearData(shouldClear) {
+    const modal = document.getElementById("clearConfirmModal");
+    if(modal) modal.classList.remove("active");
     
-    const report = document.getElementById("pdfReport");
-    report.style.display = "block";
-    report.style.visibility = "visible";
-
-    const options = {
-        margin: [10, 10, 10, 10],
-        filename: "Vedanta_Report_" + document.getElementById("billNo").value + ".pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { 
-            scale: 2, 
-            useCORS: true, 
-            logging: false,
-            letterRendering: true
-        },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-    };
-
-    html2pdf().set(options).from(report).toPdf().get('pdf').then(function (pdf) {
-        // Asynchronous structural safe download mapping
-    }).save();
-}
-
-function printReport(){
-    generatePreview();
-    window.print();
-}
-
-/* HIGH-TECH RESET: CLEARS EVERYTHING & FORCES FULL FRESH CLEAN STATE HOIST REBOOT */
-function clearData(){
-    if(confirm("Do you want to clear all data?")){
-        localStorage.clear(); // Complete wipe out including signatures
-        
-        const inputs = document.querySelectorAll("input, textarea, select");
-        inputs.forEach(item => {
-            if(item.id !== "location") item.value = "";
-        });
-
-        const previewSpans = document.querySelectorAll("#pdfReport span, #pdfReport td");
-        previewSpans.forEach(span => span.innerText = "");
-        
-        document.getElementById("pExpenseWords").innerText = "";
-        document.getElementById("sigImage").style.display = "none";
-        document.getElementById("sigImage").src = "";
-        
-        if (canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Force fully refresh the system immediately
+    if(shouldClear) {
+        localStorage.clear();
         location.reload();
     }
 }
 
-setInterval(function(){ generateDateTime(); }, 1000);
-
-
-// Modern Glass-Frame Alert System
-function showGlassAlert(message, type = 'success', duration = 4000) {
-    // Create alert container if it doesn't exist
-    let alertContainer = document.getElementById('glassAlertContainer');
-    if (!alertContainer) {
-        alertContainer = document.createElement('div');
-        alertContainer.id = 'glassAlertContainer';
-        alertContainer.className = 'glass-alert-container';
-        document.body.appendChild(alertContainer);
-    }
-
-    // Create alert element
-    const alert = document.createElement('div');
-    alert.className = `glass-alert glass-alert-${type}`;
+function downloadPDF(){
+    generatePreview();
+    const report = document.getElementById("pdfReport");
     
-    const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+    const options = {
+        margin: [12, 12, 12, 12], 
+        filename: "Vedanta_Premium_Report_" + (document.getElementById("billNo").value || "Report") + ".pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2.5, useCORS: true, logging: false, letterRendering: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    };
     
-    alert.innerHTML = `
-        <div class="glass-alert-content">
-            <span class="glass-alert-icon">${icon}</span>
-            <span class="glass-alert-message">${message}</span>
-        </div>
-    `;
-    
-    alertContainer.appendChild(alert);
-    
-    // Trigger animation
-    setTimeout(() => {
-        alert.classList.add('show');
-    }, 10);
-    
-    // Remove alert after duration
-    setTimeout(() => {
-        alert.classList.remove('show');
-        setTimeout(() => {
-            alert.remove();
-        }, 300);
-    }, duration);
+    setTimeout(() => { 
+        if (typeof html2pdf !== 'undefined') {
+            html2pdf().set(options).from(report).save(); 
+        } else {
+            window.print();
+        }
+    }, 400);
 }
+
+function printReport(){ 
+    generatePreview(); 
+    setTimeout(() => {
+        window.print(); 
+    }, 300);
+}
+
+setInterval(generateDateTime, 1000);
