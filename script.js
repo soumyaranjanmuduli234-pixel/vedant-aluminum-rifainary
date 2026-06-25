@@ -3,8 +3,11 @@
 /* ADVANCED VERSION WITH PREMIUM FIX */
 /* ================================= */
 
+let canvas, ctx, isDrawing = false;
+
 document.addEventListener("DOMContentLoaded", function(){
     initializeSystem();
+    initSignaturePad();
 });
 
 function initializeSystem(){
@@ -18,15 +21,80 @@ function initializeSystem(){
 }
 
 /* ============================== */
+/* DIGITAL SIGNATURE ENGINE SETUP */
+/* ============================== */
+function initSignaturePad() {
+    canvas = document.getElementById("sigCanvas");
+    if (!canvas) return;
+    ctx = canvas.getContext("2d");
+    ctx.strokeStyle = "#0056b3"; // Professional Blue Ink
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = "round";
+
+    // Mouse Events
+    canvas.addEventListener("mousedown", (e) => { isDrawing = true; draw(e); });
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", () => { isDrawing = false; ctx.beginPath(); saveSignatureToStorage(); });
+    canvas.addEventListener("mouseout", () => isDrawing = false);
+
+    // Touch Events for Mobile/Tabs
+    canvas.addEventListener("touchstart", (e) => {
+        isDrawing = true;
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent("mousedown", {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
+    });
+    canvas.addEventListener("touchmove", (e) => {
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent("mousemove", {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
+    });
+    canvas.addEventListener("touchend", () => {
+        isDrawing = false;
+        ctx.beginPath();
+        saveSignatureToStorage();
+    });
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    const rect = canvas.getBoundingClientRect();
+    
+    // Scaling calculations to support dynamic screen ratios
+    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+}
+
+function clearSignature() {
+    if(!canvas) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.getElementById("sigImage").style.display = "none";
+    document.getElementById("sigImage").src = "";
+    localStorage.removeItem("vedanta_signature");
+}
+
+function saveSignatureToStorage() {
+    const dataURL = canvas.toDataURL();
+    localStorage.setItem("vedanta_signature", dataURL);
+}
+
+/* ============================== */
 /* AUTOMATIC SYNCS & COUNTERS */
 /* ============================== */
 function setupLiveListeners() {
-    // Dynamic Auto Fill Signature Listener
-    const nameInput = document.getElementById("employeeName");
-    nameInput.addEventListener("input", function() {
-        document.getElementById("pDigitalSignature").innerText = this.value;
-    });
-
     // Work Details Live Char & Word Counter
     const workInput = document.getElementById("workDetails");
     workInput.addEventListener("input", function() {
@@ -173,7 +241,15 @@ function generatePreview(){
     setText("pHeading", "value", "reportHeading");
     setText("pWork", "value", "workDetails");
     
-    document.getElementById("pDigitalSignature").innerText = document.getElementById("employeeName").value;
+    // Sync Drawn Signature into Report Preview Wrapper
+    const savedSig = localStorage.getItem("vedanta_signature");
+    const sigImg = document.getElementById("sigImage");
+    if (savedSig) {
+        sigImg.src = savedSig;
+        sigImg.style.display = "block";
+    } else {
+        sigImg.style.display = "none";
+    }
     
     updateStatusBadge(document.getElementById("status").value);
     updateAmountInWords(document.getElementById("expense").value);
@@ -222,7 +298,15 @@ function loadSavedData(){
         if(element) element.value = formData[key];
     }
     
-    document.getElementById("pDigitalSignature").innerText = document.getElementById("employeeName").value;
+    // Load Signature Pad state if exist
+    const savedSig = localStorage.getItem("vedanta_signature");
+    if (savedSig && canvas) {
+        const img = new Image();
+        img.src = savedSig;
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0);
+        };
+    }
     
     let txt = document.getElementById("workDetails").value.trim();
     let words = txt === "" ? 0 : txt.split(/\s+/).length;
@@ -232,7 +316,7 @@ function loadSavedData(){
 function attachAutoSave(){
     const elements = document.querySelectorAll("input, textarea, select");
     elements.forEach(function(item){
-        item.addEventListener("item", function(){
+        item.addEventListener("input", function(){
             if(item.id !== "billNo" && item.id !== "dateTime" && item.id !== "balance" && item.id !== "required") {
                 calculateBalance();
                 saveData();
@@ -253,7 +337,6 @@ function loadTheme(){
     if(localStorage.getItem("vedanta_theme") === "dark") document.body.classList.add("dark");
 }
 
-/* COMPATIBILITY ERROR FIXED PDF ENGINE */
 function downloadPDF(){
     generatePreview();
     if(typeof html2pdf === "undefined") {
@@ -279,7 +362,7 @@ function downloadPDF(){
     };
 
     html2pdf().set(options).from(report).toPdf().get('pdf').then(function (pdf) {
-        // Safe download async execution callback
+        // Asynchronous structural safe download mapping
     }).save();
 }
 
@@ -288,25 +371,26 @@ function printReport(){
     window.print();
 }
 
-/* FIX: CLEARS LOCALSTORAGE, FORM FIELDS, PREVIEW AND REFRESHES */
+/* HIGH-TECH RESET: CLEARS EVERYTHING & FORCES FULL FRESH CLEAN STATE HOIST REBOOT */
 function clearData(){
-    if(confirm("Kya aap saara input data delete karke page reset karna chahte hain?")){
-        localStorage.removeItem("vedanta_report_data");
-        localStorage.removeItem("vedanta_bill_no");
+    if(confirm("Kya aap saara input data aur signature delete karke page reset karna chahte hain?")){
+        localStorage.clear(); // Complete wipe out including signatures
         
-        // Reset inputs
         const inputs = document.querySelectorAll("input, textarea, select");
         inputs.forEach(item => {
             if(item.id !== "location") item.value = "";
         });
 
-        // Reset previews elements
-        const previewSpans = document.querySelectorAll("#pdfReport span, #pdfReport td, #pdfReport .digital-signature");
+        const previewSpans = document.querySelectorAll("#pdfReport span, #pdfReport td");
         previewSpans.forEach(span => span.innerText = "");
         
         document.getElementById("pExpenseWords").innerText = "";
+        document.getElementById("sigImage").style.display = "none";
+        document.getElementById("sigImage").src = "";
         
-        // Page reload to apply state clean up completely
+        if (canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Force fully refresh the system immediately
         location.reload();
     }
 }

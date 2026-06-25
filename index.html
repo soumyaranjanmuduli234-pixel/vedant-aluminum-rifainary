@@ -97,6 +97,15 @@
         </div>
 
         <hr>
+        <h3>Draw Employee Digital Signature</h3>
+        <div class="signature-pad-container">
+            <canvas id="sigCanvas" width="500" height="150"></canvas>
+            <div style="margin-top: 10px;">
+                <button type="button" onclick="clearSignature()" class="btn-copy" style="padding: 6px 12px; border-radius: 6px;">Clear Pad ↩️</button>
+            </div>
+        </div>
+
+        <hr>
         <h3>Expense Information</h3>
         <div class="expense-grid">
             <div class="field">
@@ -188,7 +197,9 @@
 
         <div class="signature-area">
             <div class="employee-sign">
-                <div id="pDigitalSignature" class="digital-signature"></div>
+                <div id="pDigitalSignature" class="digital-signature">
+                    <img id="sigImage" src="" alt="Signature" style="display:none; max-height: 60px; margin: 0 auto;">
+                </div>
                 <div class="signature-line"></div>
                 <p>Employee Signature</p>
             </div>

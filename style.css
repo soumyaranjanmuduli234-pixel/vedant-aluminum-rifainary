@@ -114,7 +114,7 @@ body{
 }
 
 .company-logo{
-    width:180px;
+    width:380px;
     height:auto;
 }
 
@@ -199,6 +199,26 @@ hr{
     border:none;
     height:1px;
     background:var(--border);
+}
+
+/* SIGNATURE PAD CUSTOM CONTAINER */
+.signature-pad-container {
+    max-width: 504px;
+    margin: 10px 0;
+}
+#sigCanvas {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    cursor: crosshair;
+    background: #ffffff;
+    display: block;
+    width: 100%;
+    max-width: 500px;
+    height: 150px;
+}
+body.dark #sigCanvas {
+    background: #f8fafc;
+    border-color: #64748b;
 }
 
 /* =============================== */
@@ -319,14 +339,11 @@ hr{
 }
 
 .digital-signature {
-    font-family: 'Georgia', serif;
-    font-style: italic;
-    font-weight: bold;
-    font-size: 20px;
-    color: #0056b3;
-    margin-bottom: 5px;
     text-align: center;
-    min-height: 30px;
+    min-height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .signature-line{
@@ -352,18 +369,37 @@ body.dark .form-card, body.dark .topbar{
     background:var(--card);
     color:var(--text);
 }
+
 body.dark .field input, body.dark .field textarea, body.dark .field select{
     background:#111827;
     color:white;
 }
-body.dark .company-name{ color:#60a5fa; }
-body.dark .btn-copy { color: white; border-color: #475569;}
+
+body.dark .company-name{ 
+    color:#60a5fa; 
+}
+
+body.dark .btn-copy { 
+    color: white; 
+    border-color: #475569;
+}
 
 /* PRINT INTERFACE */
 @media print{
     body{ background:white; padding:0; }
-    .topbar, .form-card{ display:none !important; }
-    #pdfReport{ display:block !important; margin:0; padding:15mm; box-shadow:none; border-radius:0; width:100%; max-width:none; }
+    .topbar, .form-card{ 
+        display:none !important; 
+    }
+
+    #pdfReport{ display:block !important; 
+        margin:0; 
+        padding:15mm; 
+        box-shadow:none; 
+        border-radius:0; 
+        width:100%; 
+        max-width:none; 
+    }
+
 }
 
 /* =============================== */
@@ -379,7 +415,11 @@ body.dark .btn-copy { color: white; border-color: #475569;}
         padding: 10px 5px;
         text-align: center;
     }
-    .company-name { width: 100%; font-size: 18px; margin-bottom: 5px;}
+
+    .company-name { width: 100%; 
+        font-size: 18px; 
+        margin-bottom: 5px;
+    }
     
     .topbar .action-buttons {
         position: fixed;
