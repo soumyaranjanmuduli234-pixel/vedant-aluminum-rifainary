@@ -373,7 +373,7 @@ function printReport(){
 
 /* HIGH-TECH RESET: CLEARS EVERYTHING & FORCES FULL FRESH CLEAN STATE HOIST REBOOT */
 function clearData(){
-    if(confirm("Kya aap saara input data aur signature delete karke page reset karna chahte hain?")){
+    if(confirm("Do you want to clear all data?")){
         localStorage.clear(); // Complete wipe out including signatures
         
         const inputs = document.querySelectorAll("input, textarea, select");
@@ -396,3 +396,44 @@ function clearData(){
 }
 
 setInterval(function(){ generateDateTime(); }, 1000);
+
+
+// Modern Glass-Frame Alert System
+function showGlassAlert(message, type = 'success', duration = 4000) {
+    // Create alert container if it doesn't exist
+    let alertContainer = document.getElementById('glassAlertContainer');
+    if (!alertContainer) {
+        alertContainer = document.createElement('div');
+        alertContainer.id = 'glassAlertContainer';
+        alertContainer.className = 'glass-alert-container';
+        document.body.appendChild(alertContainer);
+    }
+
+    // Create alert element
+    const alert = document.createElement('div');
+    alert.className = `glass-alert glass-alert-${type}`;
+    
+    const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+    
+    alert.innerHTML = `
+        <div class="glass-alert-content">
+            <span class="glass-alert-icon">${icon}</span>
+            <span class="glass-alert-message">${message}</span>
+        </div>
+    `;
+    
+    alertContainer.appendChild(alert);
+    
+    // Trigger animation
+    setTimeout(() => {
+        alert.classList.add('show');
+    }, 10);
+    
+    // Remove alert after duration
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => {
+            alert.remove();
+        }, 300);
+    }, duration);
+}

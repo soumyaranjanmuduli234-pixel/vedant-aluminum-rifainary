@@ -454,3 +454,21 @@ body.dark .btn-copy {
     .employee-sign, .manager-sign{ width:100%; }
     #pdfReport{ padding:15px; margin: 20px auto; }
 }
+
+
+.message { 
+    padding: 1rem; 
+    border-radius: 5px; 
+    margin-top: 1rem; 
+    display: none; 
+}
+
+.message.show { 
+    display: block; 
+}
+
+.message.success { 
+    background-color: #d4edda; 
+    color: #155724; 
+    border: 1px solid #c3e6cb; 
+}
