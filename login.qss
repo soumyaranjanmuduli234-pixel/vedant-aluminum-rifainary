@@ -1,0 +1,6 @@
+/* Basic QSS for the login window */
+QWidget { background: #f5f7fa; }
+QLabel { color: #003366; }
+QLineEdit { padding: 10px; border: 1px solid #cfcfcf; border-radius: 6px; }
+QPushButton { background: #0055aa; color: white; padding: 8px 12px; border-radius: 6px; }
+QPushButton#exit { background: #d32f2f; }

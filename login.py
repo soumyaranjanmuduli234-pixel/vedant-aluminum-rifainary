@@ -5,11 +5,13 @@ from PySide6.QtWidgets import (
     QWidget,
     QLabel,
     QVBoxLayout,
-    QHBoxLayout,
     QLineEdit,
     QPushButton,
-    QApplication
+    QApplication,
+    QMessageBox
 )
+
+from database import Database
 
 
 class LoginWindow(QWidget):
@@ -17,6 +19,7 @@ class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
 
+        self.db = Database()
         self.setWindowTitle("Vedanta Report System - Login")
         self.setFixedSize(520, 650)
 
@@ -135,6 +138,9 @@ class LoginWindow(QWidget):
         """)
 
         self.exitBtn.clicked.connect(QApplication.quit)
+        self.loginBtn.clicked.connect(self.handle_login)
+        self.username.returnPressed.connect(self.handle_login)
+        self.password.returnPressed.connect(self.handle_login)
 
         mainLayout.addStretch()
 
@@ -159,3 +165,30 @@ class LoginWindow(QWidget):
         mainLayout.addStretch()
 
         self.setLayout(mainLayout)
+
+    def handle_login(self):
+        username = self.username.text().strip()
+        password = self.password.text().strip()
+
+        if not username or not password:
+            QMessageBox.warning(self, "Missing Credentials", "Enter both username and password.")
+            return
+
+        user = self.db.verify_login(username, password)
+        if user:
+            QMessageBox.information(self, "Login Successful", f"Welcome back, {user['fullname']}.")
+            self.open_dashboard()
+        else:
+            QMessageBox.warning(self, "Login Failed", "Invalid username or password.")
+
+    def open_dashboard(self):
+        try:
+            # import lazily to avoid import-time failure if QtWebEngine isn't available
+            from dashboard import DashboardWindow
+        except Exception as e:
+            QMessageBox.critical(self, "Dashboard Load Error", f"Unable to open dashboard:\n{e}")
+            return
+
+        self.dashboard = DashboardWindow()
+        self.dashboard.show()
+        self.close()

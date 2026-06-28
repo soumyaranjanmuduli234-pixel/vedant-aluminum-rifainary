@@ -15,7 +15,10 @@ class Database:
     def __init__(self):
         os.makedirs(DB_FOLDER, exist_ok=True)
         self.conn = sqlite3.connect(DB_PATH)
+        self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
+        self.create_tables()
+        self.create_default_admin()
 
     # -----------------------------
     # Create All Tables
